@@ -1,38 +1,41 @@
 @echo off
 REM ============================================
-REM バッチファイル：指定したフォルダを検索して移動
+REM バッチファイル：フォルダごとまとめて移動
 REM ============================================
 
-REM 【1】バッチファイルのあるフォルダを基準に設定
+REM 【1】バッチファイルのある場所を基準に処理開始
 cd /d %~dp0
 set "BaseDir=%cd%"
 
-REM 【2】検索する対象フォルダの親パスを指定（必要に応じて修正）
-set "SearchDir=%BaseDir%\フォルダの指定(あれば)"
+REM 【2】移動元フォルダを指定
+REM 例）「フォルダの指定」を書き換えて使う
+set "SourceDir=%BaseDir%\フォルダの指定"
 
-REM 【3】検索するフォルダ名のパターンを指定
-REM 例）*作業* とすると「作業」を含むフォルダが対象になる
-set "FolderPattern=*フォルダの名前*"
-
-REM 【4】移動先フォルダを指定
+REM 【3】移動先フォルダを指定
 set "DestDir=%BaseDir%\移動先"
 
-REM 【5】移動先フォルダが存在しなければ作成
+REM 【4】移動元フォルダの存在確認
+if not exist "%SourceDir%" (
+    echo エラー：移動元が存在しません → %SourceDir%
+    pause
+    exit /b
+)
+
+REM 【5】移動先フォルダが無ければ作成
 if not exist "%DestDir%" (
     echo 移動先フォルダを作成しました: %DestDir%
     mkdir "%DestDir%"
 )
 
-REM 【6】対象フォルダを検索して順に移動
-for /d /r "%SearchDir%" %%a in (%FolderPattern%) do (
-    echo 移動中: "%%a" → "%DestDir%"
-    move "%%a" "%DestDir%"
-)
+REM 【6】フォルダごとまとめて移動
+echo 移動開始: %SourceDir% → %DestDir%
+move "%SourceDir%" "%DestDir%"
 
-REM 【7】終了メッセージ
+REM 【7】処理完了メッセージ
 echo.
 echo --------------------------------------------
-echo 処理が完了しました。
-echo 出力先: %DestDir%
+echo フォルダごと移動が完了しました。
+echo 移動元 : %SourceDir%
+echo 移動先 : %DestDir%
 echo --------------------------------------------
 pause
